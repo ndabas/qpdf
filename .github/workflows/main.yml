@@ -8,6 +8,7 @@ on:
       - build
       - build/*
   pull_request:
+  workflow_dispatch:
   schedule:
     # Building regularly with cron makes it safe for us to use
     # *-latest with runs-on. If a new version of tools or agents comes
@@ -25,6 +26,7 @@ jobs:
         run: build-scripts/prebuild
         env:
           GH_TOKEN: ${{ github.token }}
+          QPDF_VCPKG_REPO: ${{ vars.QPDF_VCPKG_REPO }}
       - name: 'Upload documentation for later build steps'
         uses: actions/upload-artifact@v7
         with:
