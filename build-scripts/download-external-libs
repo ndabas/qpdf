@@ -1,10 +1,15 @@
 #!/bin/bash
 set -e
 tag=vcpkg-cache-v1
-# Always pull from the main qpdf repo, not a fork.
-repo=qpdf/qpdf
+# Pull from the main qpdf repo, not a fork. A fork testing changes to the set of vcpkg triplets can
+# set QPDF_VCPKG_REPO to use its own cache instead.
+repo=${QPDF_VCPKG_REPO:-qpdf/qpdf}
 latest=$(gh release view --repo $repo $tag \
             --json assets --jq '.assets[]|(.updatedAt + " " + .name)' | \
              sort -r | head -n 1 | awk '{print $NF}')
+if [ -z "$latest" ]; then
+    echo 1>&2 "$(basename $0): no assets found in $repo release $tag"
+    exit 2
+fi
 gh release download --repo $repo $tag -p $latest
 mv $latest vcpkg.zip
